@@ -26,48 +26,48 @@ export function VeeDashboard({
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+      <h1 className="text-2xl font-semibold text-gray-100">Dashboard</h1>
 
-      <section className="bg-white rounded-xl border border-gray-200 p-4">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Current Status Overview</h2>
+      <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] p-4">
+        <h2 className="text-base font-semibold text-gray-100 mb-4">Current Status Overview</h2>
         <div className="grid grid-cols-3 gap-4">
-          <Link href="/clients" className="rounded-xl bg-white border border-gray-200 border-l-4 border-l-[#059669] p-4 text-center hover:border-gray-300 transition-colors">
+          <Link href="/clients" className="rounded-xl bg-[#27272A] border border-[#3F3F46] border-l-4 border-l-[#059669] p-4 text-center hover:border-[#52525B] transition-colors">
             <div className="text-4xl font-semibold text-[#059669]">{green}</div>
-            <div className="text-sm text-gray-500 mt-2">Green</div>
-            <div className="text-[13px] text-gray-400 mt-1">{totalWithStatus > 0 ? Math.round((green / totalWithStatus) * 100) : 0}%</div>
+            <div className="text-sm text-gray-400 mt-2">Green</div>
+            <div className="text-[13px] text-gray-500 mt-1">{totalWithStatus > 0 ? Math.round((green / totalWithStatus) * 100) : 0}%</div>
           </Link>
-          <Link href="/clients" className="rounded-xl bg-white border border-gray-200 border-l-4 border-l-[#D97706] p-4 text-center hover:border-gray-300 transition-colors">
+          <Link href="/clients" className="rounded-xl bg-[#27272A] border border-[#3F3F46] border-l-4 border-l-[#D97706] p-4 text-center hover:border-[#52525B] transition-colors">
             <div className="text-4xl font-semibold text-[#D97706]">{yellow}</div>
-            <div className="text-sm text-gray-500 mt-2">Yellow</div>
-            <div className="text-[13px] text-gray-400 mt-1">{totalWithStatus > 0 ? Math.round((yellow / totalWithStatus) * 100) : 0}%</div>
+            <div className="text-sm text-gray-400 mt-2">Yellow</div>
+            <div className="text-[13px] text-gray-500 mt-1">{totalWithStatus > 0 ? Math.round((yellow / totalWithStatus) * 100) : 0}%</div>
           </Link>
-          <Link href="/clients" className="rounded-xl bg-white border border-gray-200 border-l-4 border-l-[#DC2626] p-4 text-center hover:border-gray-300 transition-colors">
+          <Link href="/clients" className="rounded-xl bg-[#27272A] border border-[#3F3F46] border-l-4 border-l-[#DC2626] p-4 text-center hover:border-[#52525B] transition-colors">
             <div className="text-4xl font-semibold text-[#DC2626]">{red}</div>
-            <div className="text-sm text-gray-500 mt-2">Red</div>
-            <div className="text-[13px] text-gray-400 mt-1">{totalWithStatus > 0 ? Math.round((red / totalWithStatus) * 100) : 0}%</div>
+            <div className="text-sm text-gray-400 mt-2">Red</div>
+            <div className="text-[13px] text-gray-500 mt-1">{totalWithStatus > 0 ? Math.round((red / totalWithStatus) * 100) : 0}%</div>
           </Link>
         </div>
         {totalWithStatus < totalClients && (
-          <p className="text-xs text-gray-400 mt-3 text-center">
+          <p className="text-xs text-gray-500 mt-3 text-center">
             {totalClients - totalWithStatus} client{(totalClients - totalWithStatus) !== 1 ? 's' : ''} with no status logged yet
           </p>
         )}
       </section>
 
-      <section className="bg-white rounded-xl border border-gray-200 p-4">
-        <h2 className="text-base font-semibold text-gray-900 mb-1">Needs Your Attention</h2>
-        <p className="text-[13px] text-gray-500 mb-4">
+      <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] p-4">
+        <h2 className="text-base font-semibold text-gray-100 mb-1">Needs Your Attention</h2>
+        <p className="text-[13px] text-gray-400 mb-4">
           Clients with status drops and clients not updated in 7+ days.
         </p>
 
         {attentionItems.length === 0 ? (
-          <p className="text-sm text-gray-400 py-6 text-center">No items need attention right now.</p>
+          <p className="text-sm text-gray-500 py-6 text-center">No items need attention right now.</p>
         ) : (
           <div className="space-y-3">
             {attentionItems.map((item, i) => (
               <div
                 key={`${item.type}-${i}`}
-                className={`flex items-center gap-3 p-3 rounded-lg bg-white border border-gray-200 border-l-4 ${
+                className={`flex items-center gap-3 p-3 rounded-lg bg-[#27272A] border border-[#3F3F46] border-l-4 ${
                   item.type === 'drop' ? 'border-l-[#DC2626]' : 'border-l-[#D97706]'
                 }`}
               >
@@ -77,26 +77,26 @@ export function VeeDashboard({
                 <div className="flex-1 min-w-0">
                   <Link
                     href={`/clients/${item.client_id}`}
-                    className="text-sm font-medium text-gray-900 hover:text-[#4F46E5] hover:underline"
+                    className="text-sm font-medium text-gray-100 hover:text-[#818CF8] hover:underline"
                   >
                     {item.client_name}
                   </Link>
-                  <div className="text-[13px] text-gray-500">
+                  <div className="text-[13px] text-gray-400">
                     {item.account_manager} &middot; {item.description}
                   </div>
                 </div>
-                <span className="text-[13px] text-gray-400 whitespace-nowrap flex-shrink-0">{item.date}</span>
+                <span className="text-[13px] text-gray-500 whitespace-nowrap flex-shrink-0">{item.date}</span>
               </div>
             ))}
           </div>
         )}
       </section>
 
-      <div className="flex items-center gap-4 text-sm text-gray-400 pt-2">
-        <Link href="/clients" className="text-[#4F46E5] hover:text-[#4338CA] hover:underline">
+      <div className="flex items-center gap-4 text-sm text-gray-500 pt-2">
+        <Link href="/clients" className="text-[#818CF8] hover:text-[#6366F1] hover:underline">
           View all clients &rarr;
         </Link>
-        <Link href="/admin" className="text-[#4F46E5] hover:text-[#4338CA] hover:underline">
+        <Link href="/admin" className="text-[#818CF8] hover:text-[#6366F1] hover:underline">
           View all alerts &rarr;
         </Link>
       </div>

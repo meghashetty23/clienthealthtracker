@@ -68,9 +68,16 @@ export async function updateClient(id: string, formData: FormData) {
 
 export async function deleteClient(id: string) {
   const supabase = await createServerSupabase()
+
+  const { error: settingsError } = await supabase
+    .from('settings')
+    .delete()
+    .eq('key', `client_lost:${id}`)
+
   const { error } = await supabase.from('clients').delete().eq('id', id)
 
   if (error) throw new Error(error.message)
   revalidatePath('/')
-  redirect('/')
+  revalidatePath('/clients')
+  redirect('/clients')
 }

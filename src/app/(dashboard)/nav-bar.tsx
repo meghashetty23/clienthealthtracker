@@ -12,10 +12,10 @@ export default function NavBar() {
   }
 
   return (
-    <nav className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
+    <nav className="bg-[#27272A] border-b border-[#3F3F46] px-4 sm:px-6 py-3">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-lg font-bold text-gray-900">
+          <Link href="/" className="text-lg font-bold text-gray-100">
             Health Tracker
           </Link>
           <div className="flex items-center gap-1">
@@ -23,8 +23,8 @@ export default function NavBar() {
               href="/clients"
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 isActive('/clients')
-                  ? 'bg-[#EEF2FF] text-[#4F46E5]'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-[#F3F4F6]'
+                  ? 'bg-[#1E1B4B] text-[#818CF8]'
+                  : 'text-gray-400 hover:text-gray-100 hover:bg-[#1F1F23]'
               }`}
             >
               Clients
@@ -33,8 +33,8 @@ export default function NavBar() {
               href="/overview"
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 pathname === '/overview'
-                  ? 'bg-[#EEF2FF] text-[#4F46E5]'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-[#F3F4F6]'
+                  ? 'bg-[#1E1B4B] text-[#818CF8]'
+                  : 'text-gray-400 hover:text-gray-100 hover:bg-[#1F1F23]'
               }`}
             >
               Overview
@@ -43,21 +43,11 @@ export default function NavBar() {
               href="/admin"
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 pathname === '/admin'
-                  ? 'bg-[#EEF2FF] text-[#4F46E5]'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-[#F3F4F6]'
+                  ? 'bg-[#1E1B4B] text-[#818CF8]'
+                  : 'text-gray-400 hover:text-gray-100 hover:bg-[#1F1F23]'
               }`}
             >
               Alerts
-            </Link>
-            <Link
-              href="/performance"
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                pathname === '/performance'
-                  ? 'bg-[#EEF2FF] text-[#4F46E5]'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-[#F3F4F6]'
-              }`}
-            >
-              Performance
             </Link>
           </div>
         </div>

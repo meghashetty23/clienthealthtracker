@@ -31,16 +31,16 @@ function TrendDots({ statuses }: { statuses: (StatusColor | null)[] }) {
 function StatusBadge({ status }: { status: string | null }) {
   if (!status) {
     return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-400">
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#1F1F23] text-gray-500">
         No log
       </span>
     )
   }
 
   const styles: Record<string, string> = {
-    Green: 'bg-[#ECFDF5] text-[#059669] ring-[#059669]/20',
-    Yellow: 'bg-[#FFFBEB] text-[#D97706] ring-[#D97706]/20',
-    Red: 'bg-[#FEF2F2] text-[#DC2626] ring-[#DC2626]/20',
+    Green: 'bg-[#064E3B] text-[#34D399] ring-[#34D399]/20',
+    Yellow: 'bg-[#422006] text-[#FBBF24] ring-[#FBBF24]/20',
+    Red: 'bg-[#450A0A] text-[#EF4444] ring-[#EF4444]/20',
   }
 
   return (
@@ -54,9 +54,9 @@ function StatusBadge({ status }: { status: string | null }) {
 
 function PriorityBadge({ priority }: { priority: string }) {
   const styles: Record<string, string> = {
-    High: 'text-[#4F46E5] border border-[#4F46E5]/30',
-    Medium: 'text-gray-500 border border-gray-200',
-    Low: 'text-gray-400 border border-gray-200',
+    High: 'text-[#818CF8] border border-[#818CF8]/30',
+    Medium: 'text-gray-400 border border-[#3F3F46]',
+    Low: 'text-gray-500 border border-[#3F3F46]',
   }
   return (
     <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${styles[priority] || styles.Medium}`}>
@@ -89,25 +89,25 @@ function SummaryCard({
     Green: 'text-[#059669]',
     Yellow: 'text-[#D97706]',
     Red: 'text-[#DC2626]',
-    Gray: 'text-gray-900',
+    Gray: 'text-gray-100',
   }
 
   const activeStyles: Record<string, string> = {
     Green: 'ring-2 ring-[#059669]/30',
     Yellow: 'ring-2 ring-[#D97706]/30',
     Red: 'ring-2 ring-[#DC2626]/30',
-    Gray: 'ring-2 ring-gray-300',
+    Gray: 'ring-2 ring-[#52525B]',
   }
 
   return (
     <button
       onClick={onClick}
-      className={`flex-1 min-w-[140px] px-4 py-3 rounded-xl border border-gray-200 border-l-4 text-left transition-all cursor-pointer bg-white
-        ${active ? activeStyles[color] : 'hover:border-gray-300'}
+      className={`flex-1 min-w-[140px] px-4 py-3 rounded-xl border border-[#3F3F46] border-l-4 text-left transition-all cursor-pointer bg-[#27272A]
+        ${active ? activeStyles[color] : 'hover:border-[#52525B]'}
         ${borderColors[color]}`}
     >
       <div className={`text-2xl font-semibold ${countColors[color]}`}>{count}</div>
-      <div className="text-sm text-gray-500">{label}</div>
+      <div className="text-sm text-gray-400">{label}</div>
     </button>
   )
 }
@@ -223,9 +223,9 @@ export function ClientDashboard({
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Clients</h1>
+        <h1 className="text-2xl font-semibold text-gray-100">Clients</h1>
         <div className="flex items-center gap-3">
-          <span className="text-[13px] text-gray-500">{clients.length} total</span>
+          <span className="text-[13px] text-gray-400">{clients.length} total</span>
           <button
             onClick={() => setShowForm(true)}
             className="bg-[#4F46E5] text-white py-1.5 px-3 rounded-lg text-sm font-medium hover:bg-[#4338CA] transition-colors cursor-pointer"
@@ -266,42 +266,42 @@ export function ClientDashboard({
         />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-[#27272A] rounded-xl border border-[#3F3F46] overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200 bg-[#FAFAFA]">
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <button onClick={() => toggleSort('name')} className="hover:text-gray-900 cursor-pointer">
+            <tr className="border-b border-[#3F3F46] bg-[#1F1F23]">
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <button onClick={() => toggleSort('name')} className="hover:text-gray-100 cursor-pointer">
                   Name{sortIndicator('name')}
                 </button>
               </th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                <button onClick={() => toggleSort('account_manager')} className="hover:text-gray-900 cursor-pointer">
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">
+                <button onClick={() => toggleSort('account_manager')} className="hover:text-gray-100 cursor-pointer">
                   Account Manager{sortIndicator('account_manager')}
                 </button>
               </th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                <button onClick={() => toggleSort('account_size')} className="hover:text-gray-900 cursor-pointer">
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">
+                <button onClick={() => toggleSort('account_size')} className="hover:text-gray-100 cursor-pointer">
                   Account Size{sortIndicator('account_size')}
                 </button>
               </th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">
+              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">
                 Priority
               </th>
-              <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <th className="text-center px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 4-Week Trend
               </th>
-              <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <button onClick={() => toggleSort('status')} className="hover:text-gray-900 cursor-pointer">
+              <th className="text-center px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <button onClick={() => toggleSort('status')} className="hover:text-gray-100 cursor-pointer">
                   Status{sortIndicator('status')}
                 </button>
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-[#3F3F46]/50">
             {filteredClients.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-sm text-gray-500">
                   No clients found
                 </td>
               </tr>
@@ -309,33 +309,30 @@ export function ClientDashboard({
               filteredClients.map((client) => (
                 <tr
                   key={client.id}
-                  className="hover:bg-[#FAFAFA] transition-colors"
+                  className="hover:bg-[#1F1F23] transition-colors"
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/clients/${client.id}`}
-                        className="text-sm text-gray-900 font-medium text-[#4F46E5] hover:text-[#4338CA] hover:underline"
+                        className="text-sm font-medium text-[#818CF8] hover:text-[#6366F1] hover:underline"
                       >
                         {client.name}
                       </Link>
-                      {!client.pending_this_week && (
-                        <span className="text-[#059669] text-sm font-bold">&#10003;</span>
-                      )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500 hidden sm:table-cell">
+                  <td className="px-4 py-3 text-sm text-gray-400 hidden sm:table-cell">
                     <Link
                       href={`/account-manager/${encodeURIComponent(client.account_manager)}`}
-                      className="text-[#4F46E5] hover:text-[#4338CA] hover:underline"
+                      className="text-[#818CF8] hover:text-[#6366F1] hover:underline"
                     >
                       {client.account_manager}
                     </Link>
                   </td>
                   <td className="px-4 py-3 text-sm hidden md:table-cell">
                     {client.account_size != null
-                      ? <span className="text-gray-900">฿{client.account_size.toLocaleString('en-US')}</span>
-                      : <span className="text-gray-400">Not set</span>}
+                      ? <span className="text-gray-100">฿{client.account_size.toLocaleString('en-US')}</span>
+                      : <span className="text-gray-500">Not set</span>}
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell">
                     <PriorityBadge priority={client.priority} />
@@ -356,19 +353,19 @@ export function ClientDashboard({
       </div>
 
       {filter !== 'all' && (
-        <p className="text-xs text-gray-400 mt-2">
-          Showing clients with <strong>{filter}</strong> status. Click again to clear filter.
+        <p className="text-xs text-gray-500 mt-2">
+          Showing clients with <strong className="text-gray-300">{filter}</strong> status. Click again to clear filter.
         </p>
       )}
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl border border-gray-200 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-[#27272A] rounded-xl shadow-xl border border-[#3F3F46] w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 pb-2">
-              <h2 className="text-base font-semibold text-gray-900">Add Client</h2>
+              <h2 className="text-base font-semibold text-gray-100">Add Client</h2>
               <button
                 onClick={() => setShowForm(false)}
-                className="text-gray-400 hover:text-gray-600 text-xl leading-none cursor-pointer"
+                className="text-gray-500 hover:text-gray-300 text-xl leading-none cursor-pointer"
               >
                 &times;
               </button>
@@ -376,60 +373,60 @@ export function ClientDashboard({
             <form onSubmit={handleCreate} className="px-4 pb-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Name <span className="text-gray-400">*</span></label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Name <span className="text-gray-500">*</span></label>
                   <input
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] placeholder-gray-500"
                     placeholder="e.g. Acme Corp"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Account Manager <span className="text-gray-400">*</span></label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Account Manager <span className="text-gray-500">*</span></label>
                   <input
                     value={formAm}
                     onChange={(e) => setFormAm(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] placeholder-gray-500"
                     placeholder="e.g. Tan"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Package <span className="text-gray-400">*</span></label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Package <span className="text-gray-500">*</span></label>
                   <input
                     value={formPkg}
                     onChange={(e) => setFormPkg(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] placeholder-gray-500"
                     placeholder="e.g. Basic, Premium, Enterprise"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Account Size (THB) <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Account Size (THB) <span className="text-gray-500 font-normal">(optional)</span></label>
                   <input
                     type="number"
                     value={formSize}
                     onChange={(e) => setFormSize(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] placeholder-gray-500"
                     placeholder="e.g. 500000"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Industry <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Industry <span className="text-gray-500 font-normal">(optional)</span></label>
                   <input
                     value={formIndustry}
                     onChange={(e) => setFormIndustry(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] placeholder-gray-500"
                     placeholder="e.g. Technology, Healthcare"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Priority <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Priority <span className="text-gray-500 font-normal">(optional)</span></label>
                   <select
                     value={formPriority}
                     onChange={(e) => setFormPriority(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                   >
                     <option value="High">High</option>
                     <option value="Medium">Medium</option>
@@ -437,44 +434,44 @@ export function ClientDashboard({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Contract Start <span className="text-gray-400">*</span></label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Contract Start <span className="text-gray-500">*</span></label>
                   <input
                     type="date"
                     value={formStart}
                     onChange={(e) => setFormStart(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Contract Length <span className="text-gray-400">*</span></label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Contract Length <span className="text-gray-500">*</span></label>
                   <input
                     value={formLen}
                     onChange={(e) => setFormLen(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                     placeholder="e.g. 6 months"
                     required
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Details / Notes <span className="text-gray-400 font-normal">(optional)</span></label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Details / Notes <span className="text-gray-500 font-normal">(optional)</span></label>
                 <textarea
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5] resize-none"
+                  className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] resize-none placeholder-gray-500"
                   placeholder="e.g. Special pricing terms, key contacts..."
                 />
               </div>
               {formError && (
-                <p className="text-sm text-[#DC2626] border border-[#DC2626]/30 border-l-4 border-l-[#DC2626] bg-white px-3 py-2 rounded-lg">{formError}</p>
+                <p className="text-sm text-[#EF4444] border border-[#EF4444]/30 border-l-4 border-l-[#EF4444] bg-[#27272A] px-3 py-2 rounded-lg">{formError}</p>
               )}
               <div className="flex gap-2 justify-end pt-2">
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                  className="px-4 py-2 text-sm font-medium text-gray-300 bg-[#1F1F23] hover:bg-[#27272A] rounded-lg transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>

@@ -32,12 +32,12 @@ function TrendLineGraph({ data }: {
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full max-w-full" style={{ minWidth: 400 }}>
         {yTicks.map((t) => (
           <g key={t}>
-            <line x1={px} y1={yScale(t)} x2={w - px} y2={yScale(t)} stroke="#E5E7EB" strokeWidth="1" />
-            <text x={px - 6} y={yScale(t) + 4} textAnchor="end" className="text-[10px] fill-gray-400">{t}</text>
+            <line x1={px} y1={yScale(t)} x2={w - px} y2={yScale(t)} stroke="#3F3F46" strokeWidth="1" />
+            <text x={px - 6} y={yScale(t) + 4} textAnchor="end" className="text-[10px] fill-gray-500">{t}</text>
           </g>
         ))}
         {data.map((d, i) => (
-          <text key={d.week} x={px + i * xStep} y={h - 4} textAnchor="middle" className="text-[9px] fill-gray-400">
+          <text key={d.week} x={px + i * xStep} y={h - 4} textAnchor="middle" className="text-[9px] fill-gray-500">
             {d.week}
           </text>
         ))}
@@ -158,43 +158,43 @@ export function OverviewDashboard({
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900">Portfolio Overview</h1>
+      <h1 className="text-2xl font-semibold text-gray-100">Portfolio Overview</h1>
 
-      <section className="bg-white rounded-xl border border-gray-200 p-4">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Current Overall Status</h2>
+      <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] p-4">
+        <h2 className="text-base font-semibold text-gray-100 mb-4">Current Overall Status</h2>
         <div className="grid grid-cols-3 gap-4">
-          <div className="rounded-xl bg-white border border-gray-200 border-l-4 border-l-[#059669] p-4 text-center">
+          <div className="rounded-xl bg-[#27272A] border border-[#3F3F46] border-l-4 border-l-[#059669] p-4 text-center">
             <div className="text-4xl font-semibold text-[#059669]">{overallGreen}</div>
-            <div className="text-sm text-gray-500 mt-2">Green</div>
-            <div className="text-[13px] text-gray-400 mt-1">{greenPct}%</div>
+            <div className="text-sm text-gray-400 mt-2">Green</div>
+            <div className="text-[13px] text-gray-500 mt-1">{greenPct}%</div>
           </div>
-          <div className="rounded-xl bg-white border border-gray-200 border-l-4 border-l-[#D97706] p-4 text-center">
+          <div className="rounded-xl bg-[#27272A] border border-[#3F3F46] border-l-4 border-l-[#D97706] p-4 text-center">
             <div className="text-4xl font-semibold text-[#D97706]">{overallYellow}</div>
-            <div className="text-sm text-gray-500 mt-2">Yellow</div>
-            <div className="text-[13px] text-gray-400 mt-1">{yellowPct}%</div>
+            <div className="text-sm text-gray-400 mt-2">Yellow</div>
+            <div className="text-[13px] text-gray-500 mt-1">{yellowPct}%</div>
           </div>
-          <div className="rounded-xl bg-white border border-gray-200 border-l-4 border-l-[#DC2626] p-4 text-center">
+          <div className="rounded-xl bg-[#27272A] border border-[#3F3F46] border-l-4 border-l-[#DC2626] p-4 text-center">
             <div className="text-4xl font-semibold text-[#DC2626]">{overallRed}</div>
-            <div className="text-sm text-gray-500 mt-2">Red</div>
-            <div className="text-[13px] text-gray-400 mt-1">{redPct}%</div>
+            <div className="text-sm text-gray-400 mt-2">Red</div>
+            <div className="text-[13px] text-gray-500 mt-1">{redPct}%</div>
           </div>
         </div>
         {totalWithStatus < totalClients && (
-          <p className="text-xs text-gray-400 mt-3 text-center">
+          <p className="text-xs text-gray-500 mt-3 text-center">
             {totalClients - totalWithStatus} client{(totalClients - totalWithStatus) !== 1 ? 's' : ''} with no status logged yet
           </p>
         )}
       </section>
 
       {atRiskTotal > 0 && (
-        <section className="bg-white rounded-xl border border-gray-200 border-l-4 border-l-[#DC2626] p-4">
+        <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] border-l-4 border-l-[#DC2626] p-4">
           <div className="flex items-center gap-1">
             <span className="text-[#DC2626] text-2xl">&#9888;</span>
             <div className="ml-3">
-              <div className="text-base font-semibold text-gray-900">
+              <div className="text-base font-semibold text-gray-100">
                 ฿{atRiskTotal.toLocaleString('en-US')} at risk this week
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400">
                 Total account size currently in Red status.
               </p>
             </div>
@@ -203,14 +203,14 @@ export function OverviewDashboard({
       )}
 
       {consecutiveRedCount > 0 && (
-        <section className="bg-white rounded-xl border border-gray-200 border-l-4 border-l-[#DC2626] p-4">
+        <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] border-l-4 border-l-[#DC2626] p-4">
           <div className="flex items-center gap-1">
             <span className="text-[#DC2626] text-2xl">&#9888;</span>
             <div className="ml-3">
-              <div className="text-base font-semibold text-gray-900">
+              <div className="text-base font-semibold text-gray-100">
                 {consecutiveRedCount} client{consecutiveRedCount !== 1 ? 's' : ''} Red for 2+ weeks
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400">
                 Multiple consecutive weeks at Red is a stronger warning sign.
               </p>
             </div>
@@ -218,21 +218,21 @@ export function OverviewDashboard({
         </section>
       )}
 
-      <section className="bg-white rounded-xl border border-gray-200 p-4">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Per Account Manager</h2>
+      <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] p-4">
+        <h2 className="text-base font-semibold text-gray-100 mb-4">Per Account Manager</h2>
         <div className="space-y-4">
           {amEntries.map(([name, data]) => {
             const gPct = data.total > 0 ? Math.round((data.green / data.total) * 100) : 0
             const yPct = data.total > 0 ? Math.round((data.yellow / data.total) * 100) : 0
             const rPct = data.total > 0 ? Math.round((data.red / data.total) * 100) : 0
             return (
-              <div key={name} className="p-4 rounded-lg border border-gray-200 bg-white">
+              <div key={name} className="p-4 rounded-lg border border-[#3F3F46] bg-[#27272A]">
                 <div className="flex items-center justify-between mb-2">
-                  <Link href={`/account-manager/${encodeURIComponent(name)}`} className="text-sm font-semibold text-[#4F46E5] hover:text-[#4338CA] hover:underline">{name}</Link>
-                  <div className="text-[13px] text-gray-400">{data.total} client{data.total !== 1 ? 's' : ''}</div>
+                  <Link href={`/account-manager/${encodeURIComponent(name)}`} className="text-sm font-semibold text-[#818CF8] hover:text-[#6366F1] hover:underline">{name}</Link>
+                  <div className="text-[13px] text-gray-500">{data.total} client{data.total !== 1 ? 's' : ''}</div>
                 </div>
                 <div className="flex gap-2">
-                  <div className="flex-1 h-8 bg-gray-100 rounded-full overflow-hidden flex">
+                  <div className="flex-1 h-8 bg-[#1F1F23] rounded-full overflow-hidden flex">
                     {data.green > 0 && <div className="bg-[#059669] h-full transition-all" style={{ width: `${gPct}%` }} title={`Green: ${data.green}`} />}
                     {data.yellow > 0 && <div className="bg-[#D97706] h-full transition-all" style={{ width: `${yPct}%` }} title={`Yellow: ${data.yellow}`} />}
                     {data.red > 0 && <div className="bg-[#DC2626] h-full transition-all" style={{ width: `${rPct}%` }} title={`Red: ${data.red}`} />}
@@ -249,14 +249,14 @@ export function OverviewDashboard({
         </div>
       </section>
 
-      <section className="bg-white rounded-xl border border-gray-200 p-4">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">8-Week Trend</h2>
+      <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] p-4">
+        <h2 className="text-base font-semibold text-gray-100 mb-4">8-Week Trend</h2>
 
         <div className="flex flex-wrap gap-3 mb-4">
           <select
             value={filterAm}
             onChange={(e) => setFilterAm(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
           >
             <option value="all">All Account Managers</option>
             {uniqueAms.map((am) => (
@@ -266,7 +266,7 @@ export function OverviewDashboard({
           <select
             value={filterClient}
             onChange={(e) => setFilterClient(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
           >
             <option value="all">All Clients</option>
             {sortedClientNames.map((n) => (
