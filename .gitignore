@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# seed script (contains service role key in .env)
+/scripts/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
