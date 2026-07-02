@@ -353,45 +353,38 @@ export function ClientDetail({
 
       {!lostInfo?.lost_at || lostInfo.reactivated_at ? (
         <div className="border-t border-[#3F3F46] pt-4 mt-2">
-          <details className="group">
-            <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-300 select-none">
-              Advanced
-            </summary>
-            <div className="mt-4">
-              <h2 className="text-sm font-medium text-gray-400 mb-3">
-                Mark as Lost
-              </h2>
-              <p className="text-[13px] text-gray-500 mb-3">
-                If this client has churned or been lost, mark them here.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  value={lostReason}
-                  onChange={(e) => setLostReason(e.target.value)}
-                  className="flex-1 px-2 py-1.5 bg-[#18181B] border border-[#52525B] rounded text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] placeholder-gray-500"
-                  placeholder="Reason for losing client..."
-                />
-                <input
-                  type="date"
-                  value={lostDate}
-                  onChange={(e) => setLostDate(e.target.value)}
-                  className="px-2 py-1.5 bg-[#18181B] border border-[#52525B] rounded text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
-                />
-                <button
-                  onClick={handleMarkLost}
-                  className="px-3 py-1.5 border border-[#EF4444]/40 text-[#EF4444] rounded text-sm font-medium hover:bg-[#EF4444]/10 transition-colors cursor-pointer"
-                >
-                  Mark as Lost
-                </button>
-              </div>
-              {lostMessage && (
-                <p className="text-sm text-[#34D399] mt-2">{lostMessage}</p>
-              )}
-              {lostError && (
-                <p className="text-sm text-[#EF4444] mt-2">{lostError}</p>
-              )}
-            </div>
-          </details>
+          <h2 className="text-sm font-medium text-gray-400 mb-3">
+            Mark as Lost
+          </h2>
+          <p className="text-[13px] text-gray-500 mb-3">
+            If this client has churned or been lost, mark them here.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              value={lostReason}
+              onChange={(e) => setLostReason(e.target.value)}
+              className="flex-1 px-2 py-1.5 bg-[#18181B] border border-[#52525B] rounded text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] placeholder-gray-500"
+              placeholder="Reason for losing client..."
+            />
+            <input
+              type="date"
+              value={lostDate}
+              onChange={(e) => setLostDate(e.target.value)}
+              className="px-2 py-1.5 bg-[#18181B] border border-[#52525B] rounded text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+            />
+            <button
+              onClick={handleMarkLost}
+              className="px-3 py-1.5 border border-[#EF4444]/40 text-[#EF4444] rounded text-sm font-medium hover:bg-[#EF4444]/10 transition-colors cursor-pointer"
+            >
+              Mark as Lost
+            </button>
+          </div>
+          {lostMessage && (
+            <p className="text-sm text-[#34D399] mt-2">{lostMessage}</p>
+          )}
+          {lostError && (
+            <p className="text-sm text-[#EF4444] mt-2">{lostError}</p>
+          )}
         </div>
       ) : (
         <div className="border-t border-[#3F3F46] pt-4 mt-2">
