@@ -108,6 +108,7 @@ function StatusBreakdownChart({ clientStatuses, uniqueAms }: {
   uniqueAms: string[]
 }) {
   const [filterAm, setFilterAm] = useState('all')
+  const [filterPriority, setFilterPriority] = useState('all')
 
   const counts = useMemo(() => {
     const initial = {
@@ -117,6 +118,7 @@ function StatusBreakdownChart({ clientStatuses, uniqueAms }: {
     }
     for (const c of clientStatuses) {
       if (filterAm !== 'all' && c.account_manager !== filterAm) continue
+      if (filterPriority !== 'all' && c.priority !== filterPriority) continue
       if (c.status !== 'Green' && c.status !== 'Yellow' && c.status !== 'Red') continue
       const pri = c.priority === 'High' ? 'High' : c.priority === 'Low' ? 'Low' : 'Medium'
       initial[c.status][pri]++
@@ -130,12 +132,16 @@ function StatusBreakdownChart({ clientStatuses, uniqueAms }: {
         Red: totalFor(initial.Red),
       },
     }
-  }, [clientStatuses, filterAm])
+  }, [clientStatuses, filterAm, filterPriority])
 
   const { totals } = counts
   const shownTotal = totals.Green + totals.Yellow + totals.Red
   const maxCount = Math.max(totals.Green, totals.Yellow, totals.Red, 1)
   const maxBarHeight = 170
+
+  const filterLabel = [filterAm !== 'all' ? filterAm : null, filterPriority !== 'all' ? `${filterPriority} Priority` : null]
+    .filter(Boolean)
+    .join(' · ')
 
   const renderBar = (status: 'Green' | 'Yellow' | 'Red') => {
     const segs = counts[status]
@@ -160,18 +166,33 @@ function StatusBreakdownChart({ clientStatuses, uniqueAms }: {
 
   return (
     <div>
-      <div className="mb-4">
-        <label className="block text-sm text-gray-400 mb-1.5">Account Manager</label>
-        <select
-          value={filterAm}
-          onChange={(e) => setFilterAm(e.target.value)}
-          className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
-        >
-          <option value="all">All Account Managers</option>
-          {uniqueAms.map((am) => (
-            <option key={am} value={am}>{am}</option>
-          ))}
-        </select>
+      <div className="flex flex-wrap gap-4 mb-4">
+        <div>
+          <label className="block text-sm text-gray-400 mb-1.5">Account Manager</label>
+          <select
+            value={filterAm}
+            onChange={(e) => setFilterAm(e.target.value)}
+            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+          >
+            <option value="all">All Account Managers</option>
+            {uniqueAms.map((am) => (
+              <option key={am} value={am}>{am}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm text-gray-400 mb-1.5">Priority</label>
+          <select
+            value={filterPriority}
+            onChange={(e) => setFilterPriority(e.target.value)}
+            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+          >
+            <option value="all">All Priorities</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
       </div>
 
       <div className="flex items-end gap-4 sm:gap-8">
@@ -181,7 +202,7 @@ function StatusBreakdownChart({ clientStatuses, uniqueAms }: {
       </div>
 
       <p className="text-sm text-gray-400 mt-4 text-center">
-        Showing {shownTotal} client{shownTotal !== 1 ? 's' : ''} — {totals.Green} Green, {totals.Yellow} Yellow, {totals.Red} Red
+        Showing {shownTotal} client{shownTotal !== 1 ? 's' : ''} — {totals.Green} Green, {totals.Yellow} Yellow, {totals.Red} Red{filterLabel ? ` (${filterLabel})` : ''}
       </p>
 
       <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-3 text-xs text-[#9CA3AF]">
