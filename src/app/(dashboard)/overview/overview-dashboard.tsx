@@ -2,89 +2,179 @@
 
 import { useState, useMemo } from 'react'
 
-function TrendLineGraph({ data }: {
-  data: { week: string; green: number; yellow: number; red: number }[]
-}) {
-  const w = 500, h = 200, px = 40, py = 20
+const STATUS_COLORS: Record<string, string> = {
+  Green: '#10B981',
+  Yellow: '#F59E0B',
+  Red: '#EF4444',
+}
 
-  const xStep = data.length > 1 ? (w - px * 2) / (data.length - 1) : 0
+function DonutChart({ green, yellow, red }: { green: number; yellow: number; red: number }) {
+  const total = green + yellow + red
+  const size = 220
+  const stroke = 26
+  const cx = size / 2
+  const r = (size - stroke) / 2
+  const c = 2 * Math.PI * r
 
-  const yScale = (val: number) => h - py - ((val / 100) * (h - py * 2))
+  let cumulative = 0
+  const segments = [
+    { label: 'Green', value: green, color: STATUS_COLORS.Green },
+    { label: 'Yellow', value: yellow, color: STATUS_COLORS.Yellow },
+    { label: 'Red', value: red, color: STATUS_COLORS.Red },
+  ]
 
-  const buildStacked = (topValues: number[], bottomValues: number[]) => {
-    if (data.length < 2) return ''
-    const n = data.length
-    const top = topValues.map((v, i) => `${px + i * xStep},${yScale(v)}`).join(' L ')
-    const bottom = bottomValues.map((v, i) => {
-      const ri = n - 1 - i
-      return `${px + ri * xStep},${yScale(v)}`
-    }).join(' L ')
-    return `M${top} L ${bottom} Z`
-  }
-
-  const yTicks = [0, 25, 50, 75, 100]
+  const arcs = total > 0
+    ? segments.map((seg) => {
+        const len = (seg.value / total) * c
+        const el = (
+          <circle
+            key={seg.label}
+            cx={cx}
+            cy={cx}
+            r={r}
+            fill="none"
+            stroke={seg.color}
+            strokeWidth={stroke}
+            strokeDasharray={`${len} ${c - len}`}
+            strokeDashoffset={-cumulative}
+            transform={`rotate(-90 ${cx} ${cx})`}
+          />
+        )
+        cumulative += len
+        return el
+      })
+    : []
 
   return (
-    <div className="w-full overflow-x-auto">
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full max-w-full" style={{ minWidth: 400 }}>
-        {yTicks.map((t) => (
-          <g key={t}>
-            <line x1={px} y1={yScale(t)} x2={w - px} y2={yScale(t)} stroke="#3F3F46" strokeWidth="1" />
-            <text x={px - 8} y={yScale(t) + 4} textAnchor="end" className="text-[10px] fill-[#9CA3AF]">{t}%</text>
-          </g>
-        ))}
-        {data.map((d, i) => (
-          <text key={d.week} x={px + i * xStep} y={h - 4} textAnchor="middle" className="text-[9px] fill-[#9CA3AF]">
-            {d.week}
-          </text>
-        ))}
-        {data.length >= 2 && (
-          <>
-            <path
-              d={buildStacked(
-                data.map((d) => d.green + d.yellow + d.red),
-                data.map((d) => d.green + d.yellow)
-              )}
-              fill="#EF4444"
-            />
-            <path
-              d={buildStacked(
-                data.map((d) => d.green + d.yellow),
-                data.map((d) => d.green)
-              )}
-              fill="#F59E0B"
-            />
-            <path
-              d={buildStacked(
-                data.map((d) => d.green),
-                data.map(() => 0)
-              )}
-              fill="#10B981"
-            />
-          </>
-        )}
-        <line
-          x1={px + (data.length - 1) * xStep}
-          y1={py}
-          x2={px + (data.length - 1) * xStep}
-          y2={h - py}
-          stroke="#9CA3AF"
-          strokeWidth="1"
-          strokeDasharray="4 3"
-        />
-        <text
-          x={px + (data.length - 1) * xStep}
-          y={py - 6}
-          textAnchor="middle"
-          className="text-[11px] fill-[#9CA3AF]"
-        >
-          current
-        </text>
+    <div className="relative inline-block">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={cx} cy={cx} r={r} fill="none" stroke="#1F1F23" strokeWidth={stroke} />
+        {arcs}
       </svg>
-      <div className="flex justify-center gap-6 mt-3 text-xs text-[#9CA3AF]">
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#10B981] inline-block" /> Green</span>
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B] inline-block" /> Yellow</span>
-        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#EF4444] inline-block" /> Red</span>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="text-3xl font-semibold text-gray-100">{total}</div>
+        <div className="text-sm text-gray-400">clients</div>
+      </div>
+    </div>
+  )
+}
+
+function PriorityBadge({ priority }: { priority: string }) {
+  const styles: Record<string, string> = {
+    High: 'text-[#818CF8] border border-[#818CF8]/30',
+    Medium: 'text-gray-400 border border-[#3F3F46]',
+    Low: 'text-gray-500 border border-[#3F3F46]',
+  }
+  return (
+    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${styles[priority] || styles.Medium}`}>
+      {priority}
+    </span>
+  )
+}
+
+function HealthSnapshotSection({ clientStatuses, uniqueAms }: {
+  clientStatuses: ClientStatusEntry[]
+  uniqueAms: string[]
+}) {
+  const [filterAm, setFilterAm] = useState('all')
+  const [filterPriority, setFilterPriority] = useState('all')
+
+  const filtered = useMemo(
+    () => clientStatuses.filter((c) => {
+      if (filterAm !== 'all' && c.account_manager !== filterAm) return false
+      if (filterPriority !== 'all' && c.priority !== filterPriority) return false
+      return true
+    }),
+    [clientStatuses, filterAm, filterPriority]
+  )
+
+  const counts = useMemo(() => {
+    let green = 0
+    let yellow = 0
+    let red = 0
+    const redClients: ClientStatusEntry[] = []
+    for (const c of filtered) {
+      if (c.status === 'Green') green++
+      else if (c.status === 'Yellow') yellow++
+      else if (c.status === 'Red') {
+        red++
+        redClients.push(c)
+      }
+    }
+    return { green, yellow, red, redClients }
+  }, [filtered])
+
+  const total = counts.green + counts.yellow + counts.red
+  const pct = (n: number) => (total > 0 ? Math.round((n / total) * 100) : 0)
+
+  const stats = [
+    { label: 'Green', count: counts.green, color: STATUS_COLORS.Green },
+    { label: 'Yellow', count: counts.yellow, color: STATUS_COLORS.Yellow },
+    { label: 'Red', count: counts.red, color: STATUS_COLORS.Red },
+  ]
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-4 mb-4">
+        <div>
+          <label className="block text-sm text-gray-400 mb-1.5">Account Manager</label>
+          <select
+            value={filterAm}
+            onChange={(e) => setFilterAm(e.target.value)}
+            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+          >
+            <option value="all">All Account Managers</option>
+            {uniqueAms.map((am) => (
+              <option key={am} value={am}>{am}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm text-gray-400 mb-1.5">Priority</label>
+          <select
+            value={filterPriority}
+            onChange={(e) => setFilterPriority(e.target.value)}
+            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+          >
+            <option value="all">All Priorities</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center gap-8">
+        <DonutChart green={counts.green} yellow={counts.yellow} red={counts.red} />
+        <div className="space-y-2">
+          {stats.map((s) => (
+            <div key={s.label} className="flex items-center gap-2 text-sm">
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }} />
+              <span style={{ color: s.color }}>
+                {s.label} · {s.count} · {pct(s.count)}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <h3 className="text-sm font-semibold text-gray-100 mb-2">At risk right now</h3>
+        {counts.redClients.length === 0 ? (
+          <p className="text-sm text-gray-500">No clients at risk right now.</p>
+        ) : (
+          <ul className="divide-y divide-[#3F3F46]/50">
+            {counts.redClients.map((c) => (
+              <li key={c.name} className="flex items-center justify-between py-2">
+                <span className="text-sm text-gray-100">{c.name}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[13px] text-gray-400">{c.account_manager}</span>
+                  <PriorityBadge priority={c.priority} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   )
@@ -226,11 +316,6 @@ export function OverviewDashboard({
   consecutiveRedCount,
   atRiskTotal = 0,
   uniqueAms = [],
-  clientNames = [],
-  clientWeekMap = [],
-  last8Mondays = [],
-  weekLabels = [],
-  uniquePriorities = [],
   clientStatuses = [],
 }: {
   totalClients: number
@@ -241,48 +326,11 @@ export function OverviewDashboard({
   consecutiveRedCount: number
   atRiskTotal?: number
   uniqueAms?: string[]
-  clientNames?: string[]
-  clientWeekMap?: { name: string; account_manager: string; priority: string; weeks: Record<string, string | null> }[]
-  last8Mondays?: string[]
-  weekLabels?: string[]
-  uniquePriorities?: string[]
   clientStatuses?: ClientStatusEntry[]
 }) {
   const greenPct = totalWithStatus > 0 ? Math.round((overallGreen / totalWithStatus) * 100) : 0
   const yellowPct = totalWithStatus > 0 ? Math.round((overallYellow / totalWithStatus) * 100) : 0
   const redPct = totalWithStatus > 0 ? Math.round((overallRed / totalWithStatus) * 100) : 0
-
-  const [filterAm, setFilterAm] = useState('all')
-  const [filterClient, setFilterClient] = useState('all')
-  const [filterPriority, setFilterPriority] = useState('all')
-
-  const sortedClientNames = useMemo(() => [...clientNames].sort(), [clientNames])
-
-  const filteredTrend = useMemo(() => {
-    const filtered = clientWeekMap.filter((c) => {
-      if (filterAm !== 'all' && c.account_manager !== filterAm) return false
-      if (filterClient !== 'all' && c.name !== filterClient) return false
-      if (filterPriority !== 'all' && c.priority !== filterPriority) return false
-      return true
-    })
-
-    return last8Mondays.map((week, i) => {
-      const label = weekLabels[i] || week
-      let g = 0, y = 0, r = 0
-      for (const c of filtered) {
-        const status = c.weeks[week]
-        if (status === 'Green') g++
-        else if (status === 'Yellow') y++
-        else if (status === 'Red') r++
-      }
-      const total = g + y + r
-      if (total === 0) return { week: label, green: 0, yellow: 0, red: 0 }
-      const greenPct = Math.round((g / total) * 100)
-      const yellowPct = Math.round((y / total) * 100)
-      const redPct = 100 - greenPct - yellowPct
-      return { week: label, green: greenPct, yellow: yellowPct, red: redPct }
-    })
-  }, [clientWeekMap, last8Mondays, filterAm, filterClient, filterPriority, weekLabels])
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
@@ -353,42 +401,9 @@ export function OverviewDashboard({
       </section>
 
       <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] p-4">
-        <h2 className="text-base font-semibold text-gray-100 mb-4">8-Week Trend</h2>
+        <h2 className="text-base font-semibold text-gray-100 mb-4">Current Health Snapshot</h2>
 
-        <div className="flex flex-wrap gap-3 mb-4">
-          <select
-            value={filterAm}
-            onChange={(e) => setFilterAm(e.target.value)}
-            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
-          >
-            <option value="all">All Account Managers</option>
-            {uniqueAms.map((am) => (
-              <option key={am} value={am}>{am}</option>
-            ))}
-          </select>
-          <select
-            value={filterClient}
-            onChange={(e) => setFilterClient(e.target.value)}
-            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
-          >
-            <option value="all">All Clients</option>
-            {sortedClientNames.map((n) => (
-              <option key={n} value={n}>{n}</option>
-            ))}
-          </select>
-          <select
-            value={filterPriority}
-            onChange={(e) => setFilterPriority(e.target.value)}
-            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
-          >
-            <option value="all">All Priorities</option>
-            {uniquePriorities.map((p) => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
-        </div>
-
-        <TrendLineGraph data={filteredTrend} />
+        <HealthSnapshotSection clientStatuses={clientStatuses} uniqueAms={uniqueAms} />
       </section>
     </div>
   )

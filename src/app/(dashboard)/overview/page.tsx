@@ -2,25 +2,6 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { OverviewDashboard } from './overview-dashboard'
 import { parseClientMeta } from '@/lib/types'
 
-function getMonday(d: Date): string {
-  const date = new Date(d)
-  const day = date.getDay()
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1)
-  date.setDate(diff)
-  return date.toISOString().split('T')[0]
-}
-
-function getLastNMondays(n: number): string[] {
-  const mondays: string[] = []
-  const today = new Date()
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(today)
-    d.setDate(d.getDate() - i * 7)
-    mondays.push(getMonday(d))
-  }
-  return mondays
-}
-
 export default async function OverviewPage() {
   const supabase = await createServerSupabase()
 
@@ -82,37 +63,7 @@ export default async function OverviewPage() {
     }
   }
 
-  const last8Mondays = getLastNMondays(8)
-  const weekLabels = last8Mondays.map((w) =>
-    new Date(w + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
-  )
-
-  // Build per-client weekly status map for client-side filtering
-  const clientWeekMap: { name: string; account_manager: string; priority: string; weeks: Record<string, string | null> }[] = []
   const uniqueAms = [...new Set(clientsArr.map((c: any) => c.account_manager))].sort()
-  const clientNames = clientsArr.map((c: any) => c.name)
-  const allPriorities = new Set<string>()
-
-  for (const c of clientsArr) {
-    const weeks: Record<string, string | null> = {}
-    const clientLogs = statuses
-      .filter((s: any) => s.client_id === c.id)
-      .sort((a: any, b: any) => a.week_date.localeCompare(b.week_date))
-    const firstStatus = clientLogs.length > 0 ? clientLogs[0].status : null
-    const meta = parseClientMeta(c.details)
-
-    for (const week of last8Mondays) {
-      const weekLog = clientLogs
-        .filter((s: any) => s.week_date <= week)
-        .sort((a: any, b: any) => b.week_date.localeCompare(a.week_date))[0]
-      weeks[week] = weekLog?.status || firstStatus
-    }
-    const priority = meta.priority ?? 'Medium'
-    allPriorities.add(priority)
-    clientWeekMap.push({ name: c.name, account_manager: c.account_manager, priority, weeks })
-  }
-
-  const uniquePriorities = ['High', 'Medium', 'Low'].filter((p) => allPriorities.has(p))
 
   const clientStatuses = clientsArr.map((c) => {
     const latest = latestPerClient.get(c.id)
@@ -135,11 +86,6 @@ export default async function OverviewPage() {
       consecutiveRedCount={consecutiveRedCount}
       atRiskTotal={atRiskTotal}
       uniqueAms={uniqueAms}
-      clientNames={clientNames}
-      clientWeekMap={clientWeekMap}
-      last8Mondays={last8Mondays}
-      weekLabels={weekLabels}
-      uniquePriorities={uniquePriorities}
       clientStatuses={clientStatuses}
     />
   )
