@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { createClient } from '@/app/actions/clients'
 import type { ClientWithStatus, StatusColor } from '@/lib/types'
 
+const statusOrder: Record<string, number> = { Green: 0, Yellow: 1, Red: 2 }
+
 function TrendDots({ statuses }: { statuses: (StatusColor | null)[] }) {
   const colors: Record<string, string> = {
     Green: 'bg-emerald-500',
@@ -118,6 +120,8 @@ export function ClientDashboard({
   clients: ClientWithStatus[]
 }) {
   const [filter, setFilter] = useState<'all' | StatusColor>('all')
+  const [filterAm, setFilterAm] = useState('all')
+  const [filterPriority, setFilterPriority] = useState<'all' | 'High' | 'Medium' | 'Low'>('all')
   const [sortBy, setSortBy] = useState<'name' | 'account_manager' | 'status' | 'account_size'>('name')
   const [sortAsc, setSortAsc] = useState(true)
 
@@ -130,12 +134,18 @@ export function ClientDashboard({
     }
   }
 
-  const statusOrder: Record<string, number> = { Green: 0, Yellow: 1, Red: 2 }
+  const uniqueAms = useMemo(
+    () => [...new Set(clients.map((c) => c.account_manager))].sort(),
+    [clients]
+  )
 
   const filteredClients = useMemo(() => {
-    let result = filter === 'all'
-      ? [...clients]
-      : clients.filter((c) => c.current_status === filter)
+    const result = clients.filter((c) => {
+      if (filter !== 'all' && c.current_status !== filter) return false
+      if (filterAm !== 'all' && c.account_manager !== filterAm) return false
+      if (filterPriority !== 'all' && c.priority !== filterPriority) return false
+      return true
+    })
 
     result.sort((a, b) => {
       let cmp = 0
@@ -152,7 +162,7 @@ export function ClientDashboard({
     })
 
     return result
-  }, [clients, filter, sortBy, sortAsc])
+  }, [clients, filter, filterAm, filterPriority, sortBy, sortAsc])
 
   const counts = {
     Green: clients.filter((c) => c.current_status === 'Green').length,
@@ -215,6 +225,12 @@ export function ClientDashboard({
     setFilter((prev) => (prev === status ? 'all' : status))
   }
 
+  function clearFilters() {
+    setFilter('all')
+    setFilterAm('all')
+    setFilterPriority('all')
+  }
+
   const sortIndicator = (field: 'name' | 'account_manager' | 'status' | 'account_size') => {
     if (sortBy !== field) return null
     return <span className="ml-1">{sortAsc ? '\u25B2' : '\u25BC'}</span>
@@ -265,6 +281,57 @@ export function ClientDashboard({
           onClick={() => toggleFilter('Red')}
         />
       </div>
+
+      <div className="flex flex-wrap items-end gap-3 mb-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-400 mb-1">Account Manager</label>
+          <select
+            value={filterAm}
+            onChange={(e) => setFilterAm(e.target.value)}
+            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+          >
+            <option value="all">All</option>
+            {uniqueAms.map((am) => (
+              <option key={am} value={am}>{am}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-400 mb-1">Status</label>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value as 'all' | StatusColor)}
+            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+          >
+            <option value="all">All</option>
+            <option value="Green">Green</option>
+            <option value="Yellow">Yellow</option>
+            <option value="Red">Red</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-400 mb-1">Priority</label>
+          <select
+            value={filterPriority}
+            onChange={(e) => setFilterPriority(e.target.value as 'all' | 'High' | 'Medium' | 'Low')}
+            className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+          >
+            <option value="all">All</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+        <button
+          onClick={clearFilters}
+          className="px-3 py-2 text-sm text-gray-400 border border-[#3F3F46] rounded-lg hover:text-gray-200 hover:border-[#52525B] transition-colors cursor-pointer"
+        >
+          Clear all filters
+        </button>
+      </div>
+      <p className="text-sm text-gray-400 mb-4">
+        Showing {filteredClients.length} of {clients.length} client{clients.length !== 1 ? 's' : ''}
+      </p>
 
       <div className="bg-[#27272A] rounded-xl border border-[#3F3F46] overflow-hidden">
         <table className="w-full">
@@ -351,12 +418,6 @@ export function ClientDashboard({
           </tbody>
         </table>
       </div>
-
-      {filter !== 'all' && (
-        <p className="text-xs text-gray-500 mt-2">
-          Showing clients with <strong className="text-gray-300">{filter}</strong> status. Click again to clear filter.
-        </p>
-      )}
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">

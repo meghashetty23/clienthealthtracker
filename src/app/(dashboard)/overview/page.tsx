@@ -51,22 +51,16 @@ export default async function OverviewPage() {
   let noStatus = 0
   let atRiskTotal = 0
 
-  const perAm: Record<string, { green: number; yellow: number; red: number; total: number }> = {}
-
   for (const c of clientsArr) {
-    const am = c.account_manager
-    if (!perAm[am]) perAm[am] = { green: 0, yellow: 0, red: 0, total: 0 }
-    perAm[am].total++
-
     const latest = latestPerClient.get(c.id)
     if (!latest) { noStatus++; continue }
 
     const meta = parseClientMeta(c.details)
 
-    if (latest.status === 'Green') { overallGreen++; perAm[am].green++ }
-    else if (latest.status === 'Yellow') { overallYellow++; perAm[am].yellow++ }
+    if (latest.status === 'Green') { overallGreen++ }
+    else if (latest.status === 'Yellow') { overallYellow++ }
     else if (latest.status === 'Red') {
-      overallRed++; perAm[am].red++
+      overallRed++
       if (meta.account_size) atRiskTotal += meta.account_size
     }
   }
@@ -120,6 +114,17 @@ export default async function OverviewPage() {
 
   const uniquePriorities = ['High', 'Medium', 'Low'].filter((p) => allPriorities.has(p))
 
+  const clientStatuses = clientsArr.map((c) => {
+    const latest = latestPerClient.get(c.id)
+    const meta = parseClientMeta(c.details)
+    return {
+      name: c.name,
+      account_manager: c.account_manager,
+      priority: meta.priority ?? 'Medium',
+      status: latest?.status ?? null,
+    }
+  })
+
   return (
     <OverviewDashboard
       totalClients={clientsArr.length}
@@ -127,7 +132,6 @@ export default async function OverviewPage() {
       overallGreen={overallGreen}
       overallYellow={overallYellow}
       overallRed={overallRed}
-      perAm={perAm}
       consecutiveRedCount={consecutiveRedCount}
       atRiskTotal={atRiskTotal}
       uniqueAms={uniqueAms}
@@ -136,6 +140,7 @@ export default async function OverviewPage() {
       last8Mondays={last8Mondays}
       weekLabels={weekLabels}
       uniquePriorities={uniquePriorities}
+      clientStatuses={clientStatuses}
     />
   )
 }

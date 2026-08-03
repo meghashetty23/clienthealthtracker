@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import Link from 'next/link'
 
 function TrendLineGraph({ data }: {
   data: { week: string; green: number; yellow: number; red: number }[]
@@ -91,13 +90,118 @@ function TrendLineGraph({ data }: {
   )
 }
 
+const STATUS_SHADES: Record<string, { high: string; medium: string; low: string }> = {
+  Green: { high: '#047857', medium: '#10B981', low: '#6EE7B7' },
+  Yellow: { high: '#B45309', medium: '#F59E0B', low: '#FCD34D' },
+  Red: { high: '#B91C1C', medium: '#EF4444', low: '#FCA5A5' },
+}
+
+type ClientStatusEntry = {
+  name: string
+  account_manager: string
+  priority: string
+  status: string | null
+}
+
+function StatusBreakdownChart({ clientStatuses, uniqueAms }: {
+  clientStatuses: ClientStatusEntry[]
+  uniqueAms: string[]
+}) {
+  const [filterAm, setFilterAm] = useState('all')
+
+  const counts = useMemo(() => {
+    const initial = {
+      Green: { High: 0, Medium: 0, Low: 0 },
+      Yellow: { High: 0, Medium: 0, Low: 0 },
+      Red: { High: 0, Medium: 0, Low: 0 },
+    }
+    for (const c of clientStatuses) {
+      if (filterAm !== 'all' && c.account_manager !== filterAm) continue
+      if (c.status !== 'Green' && c.status !== 'Yellow' && c.status !== 'Red') continue
+      const pri = c.priority === 'High' ? 'High' : c.priority === 'Low' ? 'Low' : 'Medium'
+      initial[c.status][pri]++
+    }
+    const totalFor = (o: Record<string, number>) => o.High + o.Medium + o.Low
+    return {
+      ...initial,
+      totals: {
+        Green: totalFor(initial.Green),
+        Yellow: totalFor(initial.Yellow),
+        Red: totalFor(initial.Red),
+      },
+    }
+  }, [clientStatuses, filterAm])
+
+  const { totals } = counts
+  const shownTotal = totals.Green + totals.Yellow + totals.Red
+  const maxCount = Math.max(totals.Green, totals.Yellow, totals.Red, 1)
+  const maxBarHeight = 170
+
+  const renderBar = (status: 'Green' | 'Yellow' | 'Red') => {
+    const segs = counts[status]
+    const total = totals[status]
+    const shades = STATUS_SHADES[status]
+    const barHeight = total > 0 ? Math.round((total / maxCount) * maxBarHeight) : 0
+    return (
+      <div key={status} className="flex-1 flex flex-col items-center justify-end h-56">
+        <span className="text-sm font-medium text-gray-300 mb-1.5">{total}</span>
+        <div
+          className="w-14 sm:w-24 rounded-t-md overflow-hidden"
+          style={{ height: barHeight }}
+        >
+          <div style={{ height: total > 0 ? `${(segs.High / total) * 100}%` : 0, backgroundColor: shades.high }} title={`High priority: ${segs.High}`} />
+          <div style={{ height: total > 0 ? `${(segs.Medium / total) * 100}%` : 0, backgroundColor: shades.medium }} title={`Medium priority: ${segs.Medium}`} />
+          <div style={{ height: total > 0 ? `${(segs.Low / total) * 100}%` : 0, backgroundColor: shades.low }} title={`Low priority: ${segs.Low}`} />
+        </div>
+        <span className="mt-2 text-xs text-gray-400">{status}</span>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="mb-4">
+        <label className="block text-sm text-gray-400 mb-1.5">Account Manager</label>
+        <select
+          value={filterAm}
+          onChange={(e) => setFilterAm(e.target.value)}
+          className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+        >
+          <option value="all">All Account Managers</option>
+          {uniqueAms.map((am) => (
+            <option key={am} value={am}>{am}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex items-end gap-4 sm:gap-8">
+        {renderBar('Green')}
+        {renderBar('Yellow')}
+        {renderBar('Red')}
+      </div>
+
+      <p className="text-sm text-gray-400 mt-4 text-center">
+        Showing {shownTotal} client{shownTotal !== 1 ? 's' : ''} — {totals.Green} Green, {totals.Yellow} Yellow, {totals.Red} Red
+      </p>
+
+      <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-3 text-xs text-[#9CA3AF]">
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#10B981] inline-block" /> Green</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#F59E0B] inline-block" /> Yellow</span>
+        <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#EF4444] inline-block" /> Red</span>
+      </div>
+      <p className="text-xs text-gray-500 mt-2 text-center">
+        Within each bar, darker shade = High priority, medium = Medium priority, lighter = Low priority.
+      </p>
+    </div>
+  )
+}
+
 export function OverviewDashboard({
   totalClients,
   totalWithStatus,
   overallGreen,
   overallYellow,
   overallRed,
-  perAm,
   consecutiveRedCount,
   atRiskTotal = 0,
   uniqueAms = [],
@@ -106,13 +210,13 @@ export function OverviewDashboard({
   last8Mondays = [],
   weekLabels = [],
   uniquePriorities = [],
+  clientStatuses = [],
 }: {
   totalClients: number
   totalWithStatus: number
   overallGreen: number
   overallYellow: number
   overallRed: number
-  perAm: Record<string, { green: number; yellow: number; red: number; total: number }>
   consecutiveRedCount: number
   atRiskTotal?: number
   uniqueAms?: string[]
@@ -121,12 +225,11 @@ export function OverviewDashboard({
   last8Mondays?: string[]
   weekLabels?: string[]
   uniquePriorities?: string[]
+  clientStatuses?: ClientStatusEntry[]
 }) {
   const greenPct = totalWithStatus > 0 ? Math.round((overallGreen / totalWithStatus) * 100) : 0
   const yellowPct = totalWithStatus > 0 ? Math.round((overallYellow / totalWithStatus) * 100) : 0
   const redPct = totalWithStatus > 0 ? Math.round((overallRed / totalWithStatus) * 100) : 0
-
-  const amEntries = Object.entries(perAm).sort(([a], [b]) => a.localeCompare(b))
 
   const [filterAm, setFilterAm] = useState('all')
   const [filterClient, setFilterClient] = useState('all')
@@ -223,34 +326,9 @@ export function OverviewDashboard({
       )}
 
       <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] p-4">
-        <h2 className="text-base font-semibold text-gray-100 mb-4">Per Account Manager</h2>
-        <div className="space-y-4">
-          {amEntries.map(([name, data]) => {
-            const gPct = data.total > 0 ? Math.round((data.green / data.total) * 100) : 0
-            const yPct = data.total > 0 ? Math.round((data.yellow / data.total) * 100) : 0
-            const rPct = data.total > 0 ? Math.round((data.red / data.total) * 100) : 0
-            return (
-              <div key={name} className="p-4 rounded-lg border border-[#3F3F46] bg-[#27272A]">
-                <div className="flex items-center justify-between mb-2">
-                  <Link href={`/account-manager/${encodeURIComponent(name)}`} className="text-sm font-semibold text-[#818CF8] hover:text-[#6366F1] hover:underline">{name}</Link>
-                  <div className="text-[13px] text-gray-500">{data.total} client{data.total !== 1 ? 's' : ''}</div>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1 h-8 bg-[#1F1F23] rounded-full overflow-hidden flex">
-                    {data.green > 0 && <div className="bg-[#059669] h-full transition-all" style={{ width: `${gPct}%` }} title={`Green: ${data.green}`} />}
-                    {data.yellow > 0 && <div className="bg-[#D97706] h-full transition-all" style={{ width: `${yPct}%` }} title={`Yellow: ${data.yellow}`} />}
-                    {data.red > 0 && <div className="bg-[#DC2626] h-full transition-all" style={{ width: `${rPct}%` }} title={`Red: ${data.red}`} />}
-                  </div>
-                </div>
-                <div className="flex gap-4 mt-1.5 text-[13px]">
-                  <span className="text-[#059669]">{data.green} Green</span>
-                  <span className="text-[#D97706]">{data.yellow} Yellow</span>
-                  <span className="text-[#DC2626]">{data.red} Red</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+        <h2 className="text-base font-semibold text-gray-100 mb-4">Status &amp; Priority Breakdown</h2>
+
+        <StatusBreakdownChart clientStatuses={clientStatuses} uniqueAms={uniqueAms} />
       </section>
 
       <section className="bg-[#27272A] rounded-xl border border-[#3F3F46] p-4">
