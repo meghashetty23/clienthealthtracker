@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { AMPanel } from './am-panel'
 import { parseClientMeta } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 function getMonday(d: Date): string {
   const date = new Date(d)
   const day = date.getDay()

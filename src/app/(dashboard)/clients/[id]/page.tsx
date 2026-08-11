@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { ClientDetail } from './client-detail'
 import { parseClientMeta } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   params: Promise<{ id: string }>
 }

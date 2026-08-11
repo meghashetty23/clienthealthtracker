@@ -2,6 +2,8 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { AdminPanel } from './admin-panel'
 import type { DropAlert, StaleAlert, StatusLogEntry, LostClientInfo, MissedSignal } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 const ORDER: Record<string, number> = { Red: 0, Yellow: 1, Green: 2 }
 
 function formatDate(d: string) {

@@ -2,6 +2,8 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { ClientDashboard } from '../client-dashboard'
 import { parseClientMeta } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 function getMonday(d: Date): string {
   const date = new Date(d)
   const day = date.getDay()

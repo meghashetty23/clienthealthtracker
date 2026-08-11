@@ -1,6 +1,8 @@
 import { createServerSupabase } from '@/lib/supabase-server'
 import { VeeDashboard } from './vee-dashboard'
 
+export const dynamic = 'force-dynamic'
+
 const ORDER: Record<string, number> = { Red: 0, Yellow: 1, Green: 2 }
 
 function formatDate(d: string) {

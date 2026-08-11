@@ -2,6 +2,8 @@ import { createServerSupabase } from '@/lib/supabase-server'
 import { OverviewDashboard } from './overview-dashboard'
 import { parseClientMeta } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function OverviewPage() {
   const supabase = await createServerSupabase()
 
