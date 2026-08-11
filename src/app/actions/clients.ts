@@ -31,6 +31,7 @@ export async function createClient(formData: FormData) {
 
   if (error) throw new Error(error.message)
   revalidatePath('/')
+  revalidatePath('/overview')
 }
 
 export async function updateClient(id: string, formData: FormData) {
@@ -64,6 +65,7 @@ export async function updateClient(id: string, formData: FormData) {
   if (error) throw new Error(error.message)
   revalidatePath('/')
   revalidatePath(`/clients/${id}`)
+  revalidatePath('/overview')
 }
 
 export async function deleteClient(id: string) {
@@ -79,5 +81,6 @@ export async function deleteClient(id: string) {
   if (error) throw new Error(error.message)
   revalidatePath('/')
   revalidatePath('/clients')
+  revalidatePath('/overview')
   redirect('/clients')
 }

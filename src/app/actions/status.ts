@@ -22,6 +22,7 @@ export async function logWeeklyStatus(
   if (error) throw new Error(error.message)
   revalidatePath(`/clients/${clientId}`)
   revalidatePath('/')
+  revalidatePath('/overview')
 }
 
 export async function deleteStatus(id: string, clientId: string) {
@@ -31,4 +32,5 @@ export async function deleteStatus(id: string, clientId: string) {
   if (error) throw new Error(error.message)
   revalidatePath(`/clients/${clientId}`)
   revalidatePath('/')
+  revalidatePath('/overview')
 }
