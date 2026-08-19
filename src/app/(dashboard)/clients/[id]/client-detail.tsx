@@ -349,12 +349,12 @@ export function ClientDetail({
                   min="1"
                   value={editLenNum}
                   onChange={(e) => setEditLenNum(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="w-20 px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                 />
                 <select
                   value={editLenUnit}
                   onChange={(e) => setEditLenUnit(e.target.value)}
-                  className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="flex-1 min-w-0 px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                 >
                   <option value="Weeks">Weeks</option>
                   <option value="Months">Months</option>

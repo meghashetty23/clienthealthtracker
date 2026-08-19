@@ -426,7 +426,7 @@ export function ClientDashboard({
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-[#27272A] rounded-xl shadow-xl border border-[#3F3F46] w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#27272A] rounded-xl shadow-xl border border-[#3F3F46] w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 pb-2">
               <h2 className="text-base font-semibold text-gray-100">Add Client</h2>
               <button
@@ -521,14 +521,14 @@ export function ClientDashboard({
                       min="1"
                       value={formLenNum}
                       onChange={(e) => setFormLenNum(e.target.value)}
-                      className="flex-1 px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                      className="w-20 px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                       placeholder="e.g. 6"
                       required
                     />
                     <select
                       value={formLenUnit}
                       onChange={(e) => setFormLenUnit(e.target.value)}
-                      className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                      className="flex-1 min-w-0 px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                     >
                       <option value="Weeks">Weeks</option>
                       <option value="Months">Months</option>
