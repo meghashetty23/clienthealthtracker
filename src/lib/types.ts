@@ -31,7 +31,7 @@ export function parseClientMeta(details: string | null): ClientMeta & { rawNotes
   if (!details) return {}
   try {
     const parsed = JSON.parse(details)
-    if (parsed && typeof parsed === 'object' && ('account_size' in parsed || 'industry' in parsed || 'priority' in parsed || 'notes' in parsed)) {
+    if (parsed && typeof parsed === 'object' && ('account_size' in parsed || 'industry' in parsed || 'priority' in parsed || 'contract_length_unit' in parsed || 'notes' in parsed)) {
       return parsed as ClientMeta
     }
   } catch {}
