@@ -21,6 +21,11 @@ export default async function ClientsPage() {
     .select('*')
     .order('name')
 
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('name')
+
   const clientIds = (clients as any[])?.map((c: any) => c.id) || []
 
   const { data: allStatuses } = await supabase
@@ -72,5 +77,5 @@ export default async function ClientsPage() {
     }
   })
 
-  return <ClientDashboard clients={clientsWithStatus} />
+  return <ClientDashboard clients={clientsWithStatus} profiles={profiles || []} />
 }

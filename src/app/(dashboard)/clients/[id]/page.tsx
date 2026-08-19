@@ -37,12 +37,18 @@ export default async function ClientPage({ params }: PageProps) {
 
   const meta = parseClientMeta((client as any).details)
 
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('*')
+    .order('name')
+
   return (
     <ClientDetail
       client={client}
       statusLogs={statusLogs || []}
       lostInfo={lostInfo}
       meta={meta}
+      profiles={profiles || []}
     />
   )
 }

@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { logWeeklyStatus, deleteStatus } from '@/app/actions/status'
 import { markClientLost, reactivateClient } from '@/app/actions/client-flags'
-import { deleteClient } from '@/app/actions/clients'
-import type { Client, WeeklyStatus, StatusColor, ClientMeta } from '@/lib/types'
+import { deleteClient, updateClient } from '@/app/actions/clients'
+import type { Client, WeeklyStatus, StatusColor, ClientMeta, Profile } from '@/lib/types'
 
 function getMonday(d: Date): string {
   const date = new Date(d)
@@ -22,6 +22,14 @@ function formatDate(dateStr: string): string {
     day: 'numeric',
     year: 'numeric',
   })
+}
+
+function parseContractLength(contractLength: string): { number: string; unit: string } {
+  const match = contractLength.trim().match(/^(\d+)\s*(\w+)$/)
+  if (match) {
+    return { number: match[1], unit: match[2] }
+  }
+  return { number: contractLength, unit: 'Months' }
 }
 
 function StatusIndicator({ status }: { status: string }) {
@@ -52,11 +60,13 @@ export function ClientDetail({
   statusLogs,
   lostInfo,
   meta = {},
+  profiles = [],
 }: {
   client: Client
   statusLogs: WeeklyStatus[]
   lostInfo: { reason: string; lost_at: string | null; reactivated_at: string | null } | null
   meta?: ClientMeta
+  profiles?: Profile[]
 }) {
   const router = useRouter()
   const [status, setStatus] = useState<StatusColor>('Green')
@@ -68,6 +78,18 @@ export function ClientDetail({
   const [lostDate, setLostDate] = useState(new Date().toISOString().split('T')[0])
   const [lostMessage, setLostMessage] = useState('')
   const [lostError, setLostError] = useState('')
+
+  const [editing, setEditing] = useState(false)
+  const [editAm, setEditAm] = useState(client.account_manager)
+  const [editPkg, setEditPkg] = useState(client.package)
+  const [editSize, setEditSize] = useState(meta.account_size != null ? String(meta.account_size) : '')
+  const [editIndustry, setEditIndustry] = useState(meta.industry || '')
+  const [editStart, setEditStart] = useState(client.contract_start_date)
+  const [editLenNum, setEditLenNum] = useState(() => parseContractLength(client.contract_length).number)
+  const [editLenUnit, setEditLenUnit] = useState(() => meta.contract_length_unit || parseContractLength(client.contract_length).unit || 'Months')
+  const [editPriority, setEditPriority] = useState<'High' | 'Medium' | 'Low'>(meta.priority || 'Medium')
+  const [editSaving, setEditSaving] = useState(false)
+  const [editError, setEditError] = useState('')
 
   const thisWeekMonday = getMonday(new Date())
   const existingThisWeek = statusLogs.find((s) => s.week_date === thisWeekMonday)
@@ -88,6 +110,50 @@ export function ClientDetail({
       setComment('')
     }
   }, [existingThisWeek])
+
+  function startEditing() {
+    const parsed = parseContractLength(client.contract_length)
+    setEditAm(client.account_manager)
+    setEditPkg(client.package)
+    setEditSize(meta.account_size != null ? String(meta.account_size) : '')
+    setEditIndustry(meta.industry || '')
+    setEditStart(client.contract_start_date)
+    setEditLenNum(parsed.number)
+    setEditLenUnit(meta.contract_length_unit || parsed.unit || 'Months')
+    setEditPriority(meta.priority || 'Medium')
+    setEditError('')
+    setEditing(true)
+  }
+
+  function cancelEditing() {
+    setEditing(false)
+    setEditError('')
+  }
+
+  async function handleSaveEdit() {
+    setEditSaving(true)
+    setEditError('')
+    try {
+      const fd = new FormData()
+      fd.set('name', client.name)
+      fd.set('account_manager', editAm)
+      fd.set('package', editPkg)
+      fd.set('contract_start_date', editStart)
+      fd.set('contract_length_number', editLenNum)
+      fd.set('contract_length_unit', editLenUnit)
+      fd.set('account_size', editSize)
+      fd.set('industry', editIndustry)
+      fd.set('priority', editPriority)
+      fd.set('details', meta.notes || '')
+      await updateClient(client.id, fd)
+      setEditing(false)
+      router.refresh()
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : 'Failed to save changes')
+    } finally {
+      setEditSaving(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -146,71 +212,184 @@ export function ClientDetail({
       </Link>
 
       <div className={`rounded-xl border p-4 mb-6 ${lostInfo?.lost_at && !lostInfo?.reactivated_at ? 'bg-[#27272A] border-[#3F3F46] opacity-70' : 'bg-[#27272A] border-[#3F3F46]'}`}>
-        <h1 className="text-2xl font-semibold text-gray-100 mb-4 flex items-center gap-3">
-          {client.name}
-          {lostInfo?.lost_at && !lostInfo?.reactivated_at && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#1F1F23] text-gray-400">
-              Lost
-            </span>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-semibold text-gray-100 flex items-center gap-3">
+            {client.name}
+            {lostInfo?.lost_at && !lostInfo?.reactivated_at && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#1F1F23] text-gray-400">
+                Lost
+              </span>
+            )}
+          </h1>
+          {!editing ? (
+            <button
+              onClick={startEditing}
+              className="text-sm text-[#818CF8] hover:text-[#6366F1] border border-[#818CF8]/30 px-3 py-1.5 rounded-lg hover:bg-[#818CF8]/10 transition-colors cursor-pointer"
+            >
+              Edit
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={cancelEditing}
+                className="px-3 py-1.5 text-sm font-medium text-gray-300 bg-[#1F1F23] hover:bg-[#27272A] border border-[#3F3F46] rounded-lg transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={editSaving}
+                className="bg-[#4F46E5] text-white py-1.5 px-3 rounded-lg text-sm font-medium hover:bg-[#4338CA] disabled:opacity-50 transition-colors cursor-pointer"
+              >
+                {editSaving ? 'Saving...' : 'Save'}
+              </button>
+            </div>
           )}
-        </h1>
+        </div>
+
+        {editError && (
+          <p className="text-sm text-[#EF4444] bg-[#27272A] border border-[#EF4444]/30 border-l-4 border-l-[#EF4444] px-3 py-2 rounded-lg mb-4">
+            {editError}
+          </p>
+        )}
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
             <div className="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-1">
               Account Manager
             </div>
-            <div className="text-sm text-gray-100">
-              {client.account_manager}
-            </div>
+            {editing ? (
+              <select
+                value={editAm}
+                onChange={(e) => setEditAm(e.target.value)}
+                className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              >
+                {profiles.map((p) => (
+                  <option key={p.id} value={p.name}>{p.name}</option>
+                ))}
+              </select>
+            ) : (
+              <div className="text-sm text-gray-100">
+                {client.account_manager}
+              </div>
+            )}
           </div>
           <div>
             <div className="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-1">
               Package
             </div>
-            <div className="text-sm text-gray-100">{client.package}</div>
+            {editing ? (
+              <input
+                value={editPkg}
+                onChange={(e) => setEditPkg(e.target.value)}
+                className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              />
+            ) : (
+              <div className="text-sm text-gray-100">{client.package}</div>
+            )}
           </div>
           <div>
             <div className="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-1">
               Account Size
             </div>
-            <div className="text-sm text-gray-100">
-              {meta.account_size != null ? `\u0E3F${meta.account_size.toLocaleString('en-US')}` : <span className="text-gray-500">Not set</span>}
-            </div>
+            {editing ? (
+              <input
+                type="number"
+                value={editSize}
+                onChange={(e) => setEditSize(e.target.value)}
+                className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                placeholder="e.g. 500000"
+              />
+            ) : (
+              <div className="text-sm text-gray-100">
+                {meta.account_size != null ? `\u0E3F${meta.account_size.toLocaleString('en-US')}` : <span className="text-gray-500">Not set</span>}
+              </div>
+            )}
           </div>
           <div>
             <div className="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-1">
               Industry
             </div>
-            <div className="text-sm text-gray-100">
-              {meta.industry || '\u2014'}
-            </div>
+            {editing ? (
+              <input
+                value={editIndustry}
+                onChange={(e) => setEditIndustry(e.target.value)}
+                className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                placeholder="e.g. Technology, Healthcare"
+              />
+            ) : (
+              <div className="text-sm text-gray-100">
+                {meta.industry || '\u2014'}
+              </div>
+            )}
           </div>
           <div>
             <div className="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-1">
               Contract Start
             </div>
-            <div className="text-sm text-gray-100">{contractStart}</div>
+            {editing ? (
+              <input
+                type="date"
+                value={editStart}
+                onChange={(e) => setEditStart(e.target.value)}
+                className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              />
+            ) : (
+              <div className="text-sm text-gray-100">{contractStart}</div>
+            )}
           </div>
           <div>
             <div className="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-1">
               Contract Length
             </div>
-            <div className="text-sm text-gray-100">
-              {client.contract_length}
-            </div>
+            {editing ? (
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  min="1"
+                  value={editLenNum}
+                  onChange={(e) => setEditLenNum(e.target.value)}
+                  className="flex-1 px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                />
+                <select
+                  value={editLenUnit}
+                  onChange={(e) => setEditLenUnit(e.target.value)}
+                  className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                >
+                  <option value="Weeks">Weeks</option>
+                  <option value="Months">Months</option>
+                  <option value="Years">Years</option>
+                </select>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-100">
+                {client.contract_length}
+              </div>
+            )}
           </div>
           <div>
             <div className="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-1">
               Priority
             </div>
-            <div className="text-sm text-gray-100">
-              {meta.priority || 'Medium'}
-            </div>
+            {editing ? (
+              <select
+                value={editPriority}
+                onChange={(e) => setEditPriority(e.target.value as 'High' | 'Medium' | 'Low')}
+                className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+              >
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            ) : (
+              <div className="text-sm text-gray-100">
+                {meta.priority || 'Medium'}
+              </div>
+            )}
           </div>
         </div>
 
-        {meta.notes && (
+        {meta.notes && !editing && (
           <div className="mt-4 pt-4 border-t border-[#3F3F46]">
             <div className="text-[13px] font-medium text-gray-500 uppercase tracking-wider mb-1">
               Details / Notes

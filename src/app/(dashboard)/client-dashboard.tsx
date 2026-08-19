@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/app/actions/clients'
-import type { ClientWithStatus, StatusColor } from '@/lib/types'
+import type { ClientWithStatus, StatusColor, Profile } from '@/lib/types'
 
 const statusOrder: Record<string, number> = { Green: 0, Yellow: 1, Red: 2 }
 
@@ -116,8 +116,10 @@ function SummaryCard({
 
 export function ClientDashboard({
   clients,
+  profiles = [],
 }: {
   clients: ClientWithStatus[]
+  profiles?: Profile[]
 }) {
   const [filter, setFilter] = useState<'all' | StatusColor>('all')
   const [filterAm, setFilterAm] = useState('all')
@@ -178,7 +180,8 @@ export function ClientDashboard({
   const [formAm, setFormAm] = useState('')
   const [formPkg, setFormPkg] = useState('')
   const [formStart, setFormStart] = useState('')
-  const [formLen, setFormLen] = useState('')
+  const [formLenNum, setFormLenNum] = useState('')
+  const [formLenUnit, setFormLenUnit] = useState('Months')
   const [formSize, setFormSize] = useState('')
   const [formIndustry, setFormIndustry] = useState('')
   const [formPriority, setFormPriority] = useState('Medium')
@@ -196,7 +199,8 @@ export function ClientDashboard({
     fd.set('account_manager', formAm)
     fd.set('package', formPkg)
     fd.set('contract_start_date', formStart)
-    fd.set('contract_length', formLen)
+    fd.set('contract_length_number', formLenNum)
+    fd.set('contract_length_unit', formLenUnit)
     fd.set('account_size', formSize)
     fd.set('industry', formIndustry)
     fd.set('priority', formPriority)
@@ -209,7 +213,8 @@ export function ClientDashboard({
       setFormAm('')
       setFormPkg('')
       setFormStart('')
-      setFormLen('')
+      setFormLenNum('')
+      setFormLenUnit('Months')
       setFormSize('')
       setFormIndustry('')
       setFormPriority('Medium')
@@ -445,13 +450,17 @@ export function ClientDashboard({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Account Manager <span className="text-gray-500">*</span></label>
-                  <input
+                  <select
                     value={formAm}
                     onChange={(e) => setFormAm(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5] placeholder-gray-500"
-                    placeholder="e.g. Tan"
+                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
                     required
-                  />
+                  >
+                    <option value="">Select...</option>
+                    {profiles.map((p) => (
+                      <option key={p.id} value={p.name}>{p.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Package <span className="text-gray-500">*</span></label>
@@ -506,13 +515,26 @@ export function ClientDashboard({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Contract Length <span className="text-gray-500">*</span></label>
-                  <input
-                    value={formLen}
-                    onChange={(e) => setFormLen(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
-                    placeholder="e.g. 6 months"
-                    required
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      value={formLenNum}
+                      onChange={(e) => setFormLenNum(e.target.value)}
+                      className="flex-1 px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                      placeholder="e.g. 6"
+                      required
+                    />
+                    <select
+                      value={formLenUnit}
+                      onChange={(e) => setFormLenUnit(e.target.value)}
+                      className="px-3 py-2 bg-[#18181B] border border-[#52525B] rounded-lg text-sm text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                    >
+                      <option value="Weeks">Weeks</option>
+                      <option value="Months">Months</option>
+                      <option value="Years">Years</option>
+                    </select>
+                  </div>
                 </div>
               </div>
               <div>

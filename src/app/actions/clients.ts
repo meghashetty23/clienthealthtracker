@@ -12,11 +12,18 @@ export async function createClient(formData: FormData) {
   const industry = formData.get('industry')
   const priority = formData.get('priority')
   const notes = formData.get('details')
+  const contractLengthNum = formData.get('contract_length_number') as string
+  const contractLengthUnit = (formData.get('contract_length_unit') as string) || 'Months'
+
+  const contractLength = contractLengthNum
+    ? `${contractLengthNum} ${contractLengthUnit}`
+    : ''
 
   const details = buildClientDetails({
     account_size: accountSize ? Number(accountSize) : undefined,
     industry: (industry as string) || undefined,
     priority: (priority as 'High' | 'Medium' | 'Low') || undefined,
+    contract_length_unit: contractLengthUnit,
     notes: (notes as string) || undefined,
   }, null)
 
@@ -25,7 +32,7 @@ export async function createClient(formData: FormData) {
     account_manager: formData.get('account_manager') as string,
     package: formData.get('package') as string,
     contract_start_date: formData.get('contract_start_date') as string,
-    contract_length: formData.get('contract_length') as string,
+    contract_length: contractLength,
     details,
   })
 
@@ -44,11 +51,18 @@ export async function updateClient(id: string, formData: FormData) {
   const industry = formData.get('industry')
   const priority = formData.get('priority')
   const notes = formData.get('details')
+  const contractLengthNum = formData.get('contract_length_number') as string
+  const contractLengthUnit = (formData.get('contract_length_unit') as string) || 'Months'
+
+  const contractLength = contractLengthNum
+    ? `${contractLengthNum} ${contractLengthUnit}`
+    : ''
 
   const details = buildClientDetails({
     account_size: accountSize ? Number(accountSize) : undefined,
     industry: (industry as string) || undefined,
     priority: (priority as 'High' | 'Medium' | 'Low') || undefined,
+    contract_length_unit: contractLengthUnit,
     notes: (notes as string) || undefined,
   }, existingDetails)
 
@@ -57,7 +71,7 @@ export async function updateClient(id: string, formData: FormData) {
     account_manager: formData.get('account_manager'),
     package: formData.get('package'),
     contract_start_date: formData.get('contract_start_date'),
-    contract_length: formData.get('contract_length'),
+    contract_length: contractLength,
     details,
     updated_at: new Date().toISOString(),
   }).eq('id', id)

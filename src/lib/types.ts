@@ -11,6 +11,7 @@ export interface ClientMeta {
   account_size?: number
   industry?: string
   priority?: 'High' | 'Medium' | 'Low'
+  contract_length_unit?: string
   notes?: string
 }
 
